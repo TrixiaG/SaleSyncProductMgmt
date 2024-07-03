@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTP Verification</title>
+    <link rel="stylesheet" href="../static/modal.css">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+<div id="otp-modal" class="modal" style="display: block;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <i class='bx bx-lock-alt' style='font-size: 24px;'></i>
+        <h2>Enter OTP</h2>
+        <a>A One-Time PIN has been sent to your registered email. OTP will expire in 5 minutes.</a>
+        <form id="otp-form" method="POST" action="{{ url_for('login.verify_otp') }}">
+            <div class="input-box">
+                <input type="text" placeholder="Enter OTP" required id="otp" name="otp" autocomplete="off">
+            </div>
+            <button type="submit" class="btn">Verify OTP</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function closeModal() {
+        document.getElementById('otp-modal').style.display = 'none';
+        window.location.href = '/userLogin'; 
+    }
+    
+</script>
+
+</body>
+</html>

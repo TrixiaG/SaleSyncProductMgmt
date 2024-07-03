@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaleSync Transactions</title>
+    <link rel="stylesheet" href="../static/modal.css">
+    <link rel="stylesheet" href="../static/inventory.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+</head>
+<body>
+    <div id="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="row fixed-top" style="z-index: 1000;">
+            <div class="col-md-12">
+              {% for category, message in messages %}
+                  <div class="alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+
+<div class="container">
+    {% include 'base.html'%}
+
+    <form method="POST">
+        <div class="wrapper" style="min-height: 800px; position: relative;">
+        
+            <div>
+                <span class="a1 ml-2">TRANSACTIONS</span>
+            </div>
+            <div>   
+
+            </div>
+            <div>           
+            </div>
+
+            <div>   
+            </div>  
+            <div> 
+            </div>
+            <div class="input-box">
+                <label for="prodTypeDropdown">TRANSACTION NO. </label>
+                <input type="text" id="txnNo" name="txnNo">
+            </div>
+
+            <div class="input-box">
+                <label>EMPLOYEE ID</label>
+                <input type="text" id="eid" name="eid" >
+            </div>
+
+            <div class="merge-rows"></div>
+                <div class="input-box">
+                    <label>DATE</label>
+                    <input type="text" id="date" name="date" >
+                </div>
+                <div>
+                    <button type="button" id="btnsearchh" class="btn btn-block" onclick="searchTransactions()"
+                    style="margin-bottom: 45px;">Search</button>
+                    <button type="button" id="openModalBtn" class="btn btn-block">Print Transaction Report</button>
+
+
+                </div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div>
+                <div>
+                    <form method="GET">
+                        <div class="table-responsive" style="width: 820px; height: 300px; overflow-y: scroll;">
+                            <table class="table table-striped txntable" style="height: 80px;">
+                                <thead style="height: 80px;">
+                                    <tr style="height: 80px;">
+                                        <th scope="col" style="height: 80px;">
+                                            <button class="btn btn-link sort-btn" data-column="formatted_created_at"
+                                            style="border-radius: 0; background: none; box-shadow: none; color: #ff9c03; text-decoration: none;">
+                                                <i class='bx bx-sort' data-column="tdate"></i>
+                                                Date
+                                            </button>
+                                        </th>
+                                        <th scope="col" style="height: 80px;">
+                                            <button class="btn btn-link sort-btn" data-column="transaction_id"
+                                            style="border-radius: 0; background: none; box-shadow: none; color: #ff9c03; text-decoration: none;">
+                                                <i class='bx bx-sort' data-column="txno"></i>
+                                                Transaction No.
+                                            </button>
+                                        </th>
+                                        <th scope="col" style="height: 80px;">
+                                            <button class="btn btn-link sort-btn" data-column="tuserlog"
+                                                    style="border-radius: 0; background: none; box-shadow: none; color: #ff9c03; text-decoration: none;">
+                                                <i class='bx bx-sort' data-column="tuserlog"></i>
+                                                User
+                                            </button>
+                                        </th>
+                                        <th scope="col" style="height: 80px;">
+                                            <button class="btn btn-link sort-btn"
+                                            style="border-radius: 0; background: none; box-shadow: none; color: #ff9c03; text-decoration: none;">
+                                                Actions
+                                            </button>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for transaction in transactions %}
+                                    <tr data-transaction_id="{{ transaction.transaction_id }}" data-formatted_created_at="{{ transaction.formatted_created_at }}" data-tuserlog="{{ transaction.tuserlog }}">
+                                        <td>{{ transaction.formatted_created_at }}</td>
+
+                                        <td>{{ transaction.transaction_id }}</td>
+                                        <td>{{ transaction.tuserlog }}</td>
+                                        <td>
+                                            <button type="button" class="btn btn-block btnIndivReceipt" data-filename="{{ transaction.filename }}">Download Receipt</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                    
+                    
+                </div>
+                <div>
+                </div>  
+            </form>
+
+            <!--RECEIPT PREVIEW-->
+            </div>
+            <div>
+                
+            </div>
+        </div>
+        <div id="dateRangeModal" class="modal">
+            <div class="modal-content" style="width:750px; height: 400px;">
+              <span class="close">&times;</span>
+                <h2 style="font-family: 'Montserrat'; font-weight: bold; font-size: 30px; color:#ff9c03">SELECT DATE RANGE</h2>              
+                <div class="input-box" >
+                    <label style="font-size: 12px; font-weight: bold; color: #5e5e5e;">START DATE</label>
+                  <input type="text" id="startDate" name="startDate">
+              </div>
+              <div class="input-box">
+                  <label style="font-size: 12px; font-weight: bold; color: #5e5e5e;">END DATE</label>
+                  <input type="text" id="endDate" name="endDate">
+              </div>
+              <button type="button" id="generateReportBtn" class="btn btn-block" style="margin-top: 50px">Generate Report</button>
+            </div>
+          </div>
+        
+</div>
+
+<script>
+$(document).ready(function() {
+    var currentYear = new Date().getFullYear();
+    
+    $("#date").datepicker({
+        dateFormat: 'yy-mm-dd',
+        changeMonth: true,
+        changeYear: true,
+        yearRange: `2023:${currentYear + 1}`,
+        maxDate: new Date() 
+    });
+});
+
+$(document).ready(function() {
+    let sortOrders = {
+        formatted_created_at: 'desc',
+        transaction_id: 'desc',
+        tuserlog: 'desc'
+    };
+
+    $('.sort-btn').on('click', function(event) {
+        event.preventDefault();
+
+        let columnIdentifier = $(this).data('column');
+        let currentOrder = sortOrders[columnIdentifier];
+
+        let newOrder = currentOrder === 'asc' ? 'desc' : 'asc';
+        sortOrders[columnIdentifier] = newOrder;
+
+        quicksort('.txntable', columnIdentifier, newOrder);
+    });
+
+    function quicksort(tableSelector, columnIdentifier, sortOrder) {
+        let table = document.querySelector(tableSelector); 
+        let rows = Array.from(table.rows).slice(1);
+
+        let compareFunction;
+        switch (columnIdentifier) {
+            case 'formatted_created_at':
+                compareFunction = (a, b) => {
+                    let dateA = new Date(a.cells[0].textContent);
+                    let dateB = new Date(b.cells[0].textContent);
+                    return sortOrder === 'asc' ? dateA - dateB : dateB - dateA;
+                };
+                break;
+            case 'transaction_id':
+                compareFunction = (a, b) => {
+                    let numA = parseInt(a.cells[1].textContent);
+                    let numB = parseInt(b.cells[1].textContent);
+                    return sortOrder === 'asc' ? numA - numB : numB - numA;
+                };
+                break;
+            case 'tuserlog':
+                compareFunction = (a, b) => {
+                    let userA = parseInt(a.cells[2].textContent);
+                    let userB = parseInt(b.cells[2].textContent);
+                    return sortOrder === 'asc' ? userA - userB : userB - userA;
+                };
+                break;
+            default:
+                return;
+        }
+
+        rows.sort(compareFunction);
+
+        let tbody = table.querySelector('tbody');
+        tbody.innerHTML = '';
+
+        rows.forEach(row => {
+            tbody.appendChild(row);
+        });
+    }
+
+    $('.btnIndivReceipt').on('click', function() {
+    let transactionId = $(this).closest('tr').data('transaction_id');
+    let filename = `TCFM_TransactionNo._${transactionId}`;
+    let receiptPath = `/website/receipts/${encodeURIComponent(filename)}`;
+
+    window.location.href = receiptPath;
+    });
+
+    function downloadReceipt(filename) {
+        let receiptPath = `./website/receipts/${filename}`;
+        window.location.href = receiptPath;
+    }
+
+    });
+
+function searchTransactions() {
+        const txnNo = document.getElementById('txnNo').value.trim().toLowerCase();
+        const eid = document.getElementById('eid').value.trim().toLowerCase();
+        const date = document.getElementById('date').value.trim().toLowerCase();
+
+        const tableRows = document.querySelectorAll('.txntable tbody tr');
+
+        tableRows.forEach(row => {
+            const rowDate = row.cells[0].textContent.trim().toLowerCase();
+            const rowTxnNo = row.cells[1].textContent.trim().toLowerCase();
+            const rowEid = row.cells[2].textContent.trim().toLowerCase();
+
+            if ((txnNo === '' || rowTxnNo.includes(txnNo)) &&
+                (eid === '' || rowEid.includes(eid)) &&
+                (date === '' || rowDate.includes(date))) {
+                row.style.display = ''; 
+            } else {
+                row.style.display = 'none'; 
+            }
+        });
+    }
+
+$(document).ready(function() {
+  $("#openModalBtn").click(function() {
+    $("#dateRangeModal").css("display", "block");
+  });
+
+  $(".close").click(function() {
+    $("#dateRangeModal").css("display", "none");
+  });
+
+  $(window).click(function(event) {
+    if (event.target == $("#dateRangeModal")[0]) {
+      $("#dateRangeModal").css("display", "none");
+    }
+  });
+
+  var currentYear = new Date().getFullYear();
+
+  $("#startDate").datepicker({
+    dateFormat: 'yy-mm-dd',
+    changeMonth: true,
+    changeYear: true,
+    yearRange: `2023:${currentYear + 1}`,
+    maxDate: new Date()
+  });
+
+  $("#endDate").datepicker({
+    dateFormat: 'yy-mm-dd',
+    changeMonth: true,
+    changeYear: true,
+    yearRange: `2023:${currentYear + 1}`,
+    maxDate: new Date()
+  });
+
+  $("#generateReportBtn").click(function() {
+    var startDate = $("#startDate").val();
+    var endDate = $("#endDate").val();
+
+    $.ajax({
+    url: '/generate_report',
+    type: 'POST',
+    data: {
+        startDate: startDate,
+        endDate: endDate
+    },
+    xhrFields: {
+        responseType: 'blob'  
+    },
+    success: function(response, status, xhr) {
+        var blob = new Blob([response], { type: 'application/pdf' });
+        var link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = xhr.getResponseHeader('Content-Disposition').split('=')[1]; // Extract filename from Content-Disposition header
+        link.click();
+        $("#dateRangeModal").css("display", "none");
+    },
+    error: function(error) {
+        alert("Error generating report. Please try again.");
+    }
+});
+
+  });
+});
+
+
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+crossorigin="anonymous"></script>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</body>
+</html>

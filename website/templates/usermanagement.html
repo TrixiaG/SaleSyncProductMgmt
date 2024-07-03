@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaleSync Inventory</title>
+    <link rel="stylesheet" href="../static/inventory.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+
+</head>
+
+<body>
+    <div id="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="row fixed-top" style="z-index: 1000;">
+            <div class="col-md-12">
+              {% for category, message in messages %}
+                  <div class="alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+    </div>
+<div class="container">
+    {% include 'base.html'%}
+
+    <form method="POST">
+
+        <div class="wrapper">
+            <div >
+                <span class="a1 ml-2">USER MANAGEMENT</span>
+
+            </div>
+            <div>   
+            </div>
+            <div>   
+            </div>  
+            <div class="merge-row"> 
+                <span style="font-weight: 600;" id="display-eid">{{eid}}</span>
+                <span class="a1 ml-2" id="display-first-name">{{first_name }}</span>
+            </div>
+
+            <div class="input-box">
+                <label>EMPLOYEE ID</label>
+                <input type="text" id="eid" name="eid">
+            </div>
+            <div class="input-box">
+                <label>EMAIL ADDRESS</label>
+                <input type="text" id="email" name="email">
+            </div>
+            <div>
+            </div>
+            <div>
+                <button type="btnSearch" class="btn btn-block btnSearch" onclick="searchUsers(); return false;">Search</button>
+            </div>
+            <div>
+                <button type="btnUpdate" class="btn btn-block btnUpdate" onclick="updateUser(); return false;">Update</button>
+            </div>
+
+            <div class="input-box">
+                <label>FIRST NAME</label>
+                <input type="text" id="first_name" name="first_name">
+            </div>
+            <div class="input-box">
+                <label>LAST NAME</label>
+                <input type="text" id="last_name" name="last_name">
+            </div>
+            <div></div>
+            <div>
+                <button type="btnAprv" class="btn btn-block btnAprv" onclick="approveUser(); return false;">Approve Registration</button>
+            </div>
+            <div>
+                <button type="btnDelete" class="btn btn-block btnDelete" onclick="deleteUser(); return false;">Delete</button>
+            </div>
+            <div class="input-box">
+                <label>BIRTH DATE</label>
+                <input type="text" id="bday" name="bday">
+            </div>
+            <div class="input-box">
+                <label>ACCESS LEVEL</label>
+                <input type="text" id="access" name="access">
+            </div>
+            
+        </div>
+        
+    </form>
+    <form method="GET">
+        <div class="table-wrapper">
+            <div class="table-responsive">
+                <table class="table table-striped usertable">
+                    <thead>
+                        <tr>
+                            <th scope="col">Employee ID</th>
+                            <th scope="col">Email Address</th>
+                            <th scope="col">First Name</th>
+                            <th scope="col">Last Name</th>
+                            <th scope="col">Birthdate</th>
+                            <th scope="col">Access Level</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr onclick="selectRow('{{ user.eid }}')" >
+                            <td>{{ user.eid }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.first_name }}</td>
+                            <td>{{ user.last_name }}</td>
+                            <td>{{ user.bday }}</td>
+                            <td>{{ user.access }}</td>
+
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </form>
+
+
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+
+<script>
+  $(function() {
+    $("#bday").datepicker({
+      dateFormat: 'yy-mm-dd',
+      changeMonth: true,
+      changeYear: true,
+      yearRange: "1970:2023", 
+    });
+  });
+
+  function selectRow(eid) {
+    $.ajax({
+        url: '/usermgmt/details',
+        type: 'GET',
+        data: { eid: eid }, 
+        success: function(response) {
+            document.getElementById('display-eid').innerText = response.eid;
+            document.getElementById('display-first-name').innerText = response.first_name;
+            document.getElementById('eid').value = response.eid;
+            document.getElementById('email').value = response.email;
+            document.getElementById('first_name').value = response.first_name;
+            document.getElementById('last_name').value = response.last_name;
+            document.getElementById('bday').value = response.bday;
+            document.getElementById('access').value = response.access;
+        },
+        error: function(error) {
+            alert('Error fetching user details');
+        }
+    });
+}
+
+    function updateUser() {
+    const eid = document.getElementById('eid').value;
+    const email = document.getElementById('email').value;
+    const firstName = document.getElementById('first_name').value;
+    const lastName = document.getElementById('last_name').value;
+    const bday = document.getElementById('bday').value;
+    const access = document.getElementById('access').value;
+
+    $.ajax({
+        url: '/usermgmt/update',
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({
+        eid: eid,
+        email: email,
+        first_name: firstName,
+        last_name: lastName,
+        bday: bday,
+        access: access
+        }),
+        success: function(response) {
+        alert('User updated successfully');
+        window.location.reload();
+        },
+        error: function(error) {
+        alert('Error updating user');
+        }
+    });
+    }
+
+    function deleteUser(eid) {
+        var eid = $('#eid').val();
+
+
+    if (confirm('Are you sure you want to delete this user?')) {
+        $.ajax({
+            url: `/usermgmt/delete/${eid}`,
+            type: 'DELETE',
+            success: function(response) {
+                alert(response.message);
+                if (tableRow) {
+                    tableRow.remove();
+                    window.location.reload();
+                }
+                clearFields();
+            },
+            error: function(error) {
+                alert('Error deleting user');
+            }
+        });
+    }
+}
+
+    function clearFields() {
+        document.getElementById('eid').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('first_name').value = '';
+        document.getElementById('last_name').value = '';
+        document.getElementById('bday').value = '';
+        document.getElementById('access').value = '';
+    }
+    function approveUser() {
+        const eid = document.getElementById('eid').value;
+
+        $.ajax({
+          url: '/usermgmt/approve',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            eid: eid
+          }),
+          success: function(response) {
+            alert(response.message);
+            document.getElementById('access').value = 'Staff';
+            
+            window.location.reload();
+          },
+          error: function(error) {
+            alert('Error updating user access level');
+          }
+    });
+    }
+
+    function searchUsers() {
+        const eid = document.getElementById('eid').value.trim().toLowerCase();
+        const email = document.getElementById('email').value.trim().toLowerCase();
+        const firstName = document.getElementById('first_name').value.trim().toLowerCase();
+        const lastName = document.getElementById('last_name').value.trim().toLowerCase();
+        const bday = document.getElementById('bday').value.trim().toLowerCase();
+        const access = document.getElementById('access').value.trim().toLowerCase();
+
+        const tableRows = document.querySelectorAll('.usertable tbody tr');
+
+        tableRows.forEach(row => {
+            const rowEid = row.cells[0].textContent.trim().toLowerCase(); 
+            const rowEmail = row.cells[1].textContent.trim().toLowerCase();
+            const rowFirstName = row.cells[2].textContent.trim().toLowerCase(); 
+            const rowLastName = row.cells[3].textContent.trim().toLowerCase(); 
+            const rowBday = row.cells[4].textContent.trim().toLowerCase();
+            const rowAccess = row.cells[5].textContent.trim().toLowerCase();
+
+            if ((eid === '' || rowEid.includes(eid)) &&
+                (email === '' || rowEmail.includes(email)) &&
+                (firstName === '' || rowFirstName.includes(firstName)) &&
+                (lastName === '' || rowLastName.includes(lastName)) &&
+                (bday === '' || rowBday.includes(bday)) &&
+                (access === '' || rowAccess.includes(access))) {
+                row.style.display = ''; 
+            } else {
+                row.style.display = 'none'; 
+            }
+        });
+    }
+
+
+</script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+
+
+</body>
+</html>

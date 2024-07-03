@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaleSync Help</title>
+    <link rel="stylesheet" href="../static/helpabout.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+        crossorigin="anonymous"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+</head>
+<body>
+    <div id="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="row fixed-top" style="z-index: 1000;">
+
+            <div class="col-md-12">
+              {% for category, message in messages %}
+                  <div class="alert {% if category == 'error' %}alert-danger{% else %}alert-success{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+        {% endwith %}
+        
+    </div>
+
+    <section class="py-3 py-md-5" style="margin-top: -100px;">
+      <div style="width: 1280px; text-align: center; margin: 0 auto;">
+        {% include 'base.html'%}
+      </div>
+        <div class="wrapper">
+          <div class="row gy-3 gy-md-4 gy-lg-0 align-items-lg-center">
+            <div>
+              <h1 style="font-weight: bold; font-size: 50px;">About Us</h1>
+            </div>
+            <div class="col-12 col-lg-6 col-xl-5">
+              <img class="img-fluid rounded" loading="lazy" src="./static/tcfmlogo.jpg" alt="About 1" style="margin-bottom:5px">
+            </div>
+            <div class="col-12 col-lg-6 col-xl-7">
+              <div class="row justify-content-xl-center">
+                <div class="col-12 col-xl-11">
+                  <h2 class="mb-3" style="font-weight: bold; margin-top: 20px;">The Crazy Fish Man</h2>
+                  <p class="mb-3 text-justify" style="font-size: 12px;color:#5e5e5e; font-weight: 600 ;">The Crazy Fish Man (TCFM), established in 2017 by Filipino-Chinese entrepreneur Mr. Jerome Tan De Guzman in Caloocan City, specializes in the wholesale and retail of aquarium accessories and supplies. Catering to both enthusiasts and professionals in the aquascaping community and industry, TCFM has become a go-to source for high-quality products. </p>
+                  <div class="row gy-4 gy-md-0 gx-xxl-5X">
+                    <div class="col-12 col-md-6">
+                      <div class="d-flex">
+                        <div class="me-4 text-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #5e5e5e;"><circle cx="12" cy="12" r="4"></circle>
+                            <path d="M13 4.069V2h-2v2.069A8.01 8.01 0 0 0 4.069 11H2v2h2.069A8.008 8.008 0 0 0 11 19.931V22h2v-2.069A8.007 8.007 0 0 0 19.931 13H22v-2h-2.069A8.008 8.008 0 0 0 13 4.069zM12 18c-3.309 0-6-2.691-6-6s2.691-6 6-6 6 2.691 6 6-2.691 6-6 6z"></path></svg>                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+                          </svg>
+                        </div>
+                        <div>
+                          <h2 class="h4 mb-3 margin-right-3" style="font-size: 12px; font-weight: 700; color: #5e5e5e;">Ground floor #95 6th street 9th ave East Gracepark, Caloocan, Philippines</h2>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <div class="d-flex">
+                        <div class="me-4 text-primary">
+                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: #5e5e5e;"><path d="M20 10.999h2C22 5.869 18.127 2 12.99 2v2C17.052 4 20 6.943 20 10.999z"></path><path d="M13 8c2.103 0 3 .897 3 3h2c0-3.225-1.775-5-5-5v2zm3.422 5.443a1.001 1.001 0 0 0-1.391.043l-2.393 2.461c-.576-.11-1.734-.471-2.926-1.66-1.192-1.193-1.553-2.354-1.66-2.926l2.459-2.394a1 1 0 0 0 .043-1.391L6.859 3.513a1 1 0 0 0-1.391-.087l-2.17 1.861a1 1 0 0 0-.29.649c-.015.25-.301 6.172 4.291 10.766C11.305 20.707 16.323 21 17.705 21c.202 0 .326-.006.359-.008a.992.992 0 0 0 .648-.291l1.86-2.171a1 1 0 0 0-.086-1.391l-4.064-3.696z"></path></svg>
+                        </div>
+                        <div>
+                          <h2 class="h4 mb-2 mt-1 margin-right-3" style="font-size: 15px; font-weight: 700; color: #5e5e5e;">0919 000 2649</h2>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div>
+            <h1 style="font-weight: bold; font-size: 29px; margin-top:50px">SaleSync</h1>
+            <h1 style="font-weight: 600; font-size: 12px; color: #5e5e5e;"> Version: 1.0    | Developed in Visual Studio Code using Python, Flask, and SQLite 3</h1>
+            <h1 style="font-weight: bold; font-size: 14px; color: #ff9c03; margin-top: 20px;">SYSTEM DESCRIPTION</h1>
+            <h1 class="text-justify"style="font-weight: 600; font-size: 12px; color: #5e5e5e; line-height: 1.7;">The system for The Crazy Fish Man (TCFM) integrates inventory management, a user-friendly<br>point of sale (POS) interface for generating receipts and handling transactions, and allows users<br> to generate inventory and transaction reports.
+              It features three access levels: Pending (access to <br>Help and About pages), Staff (adds Cashier Operations and Inventory pages), and Admin <br>(adds user management and transactions pages). Security is ensured with two-factor<br>  authentication via email and hashed passwords.
+              <br><br>
+              Products in the inventory and transactions are sorted using the Quick Sort Algorithm.</h1>
+              <div class="row gy-4 gy-md-0 gx-xxl-5X">
+                <div class="col-12 col-md-3">
+                  <div class="d-flex">
+                    <div class="me-4 text-primary ml-4 mt-4">
+                      <img class="img-fluid rounded" loading="lazy" src="./static/devphoto.jpg" alt="Dev 1" style="margin-bottom: 5px; max-width: 150px;">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="d-flex">
+                    <div>
+                      <h1 style="font-weight: bold; font-size: 20px; color: #ff9c03; margin-top: 80px;">Trixia Danica A. Gregorio</h1>
+                      <h1 style="font-weight: 400; font-size: 14px; color: #5e5e5e; margin-top: -10px; ">3rd Year, BS Computer Science</h1>
+
+                      <h1 style="font-weight: 700; font-size: 15px; color: #5e5e5e; margin-top: -10px; ">DEVELOPER</h1>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+          </div>
+        </div>
+      </section>
+</body>
+
+<script>
+</script>
+
+</html>

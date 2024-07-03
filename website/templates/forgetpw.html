@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forget Password</title>
+    <link rel="stylesheet" href="../static/modal.css">
+    <link rel="stylesheet" href="../static/style.css">
+</head>
+<body>
+
+<div id="forgotPasswordModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeForgotPasswordModal()" style="margin-left: 445px;">&times;</span>
+        <h2 style="font-family: 'Montserrat'; font-weight: bold; font-size: 30px; color:#ff9c03">Forgot Password</h2>
+        <form id="forgotPasswordForm" method="POST" action="{{ url_for('login.forgot_password') }}">
+            <div class="input-box">
+                <label style="font-size: 12px; font-weight: bold; color: #5e5e5e;">EID</label>
+                <input type="text" placeholder="Enter EID" required name="eid">
+            </div>
+            <div class="input-box">
+                <label style="font-size: 12px; font-weight: bold; color: #5e5e5e;">NEW PASSWORD</label>
+                <input type="password" placeholder="Enter New Password" required name="new_password" id="new_password">
+                <i class='bx bx-show-alt' onclick="togglePasswordVisibility('new_password', this)"
+                style="margin-top:5px; margin-right: 25px; font-size: 25px"></i>
+            </div>
+            <div class="input-box">
+                <label style="font-size: 12px; font-weight: bold; color: #5e5e5e;">OLD PASSWORD</label>
+                <input type="password" placeholder="Confirm New Password" required name="confirm_password" id="confirm_password">
+                <i class='bx bx-show-alt' onclick="togglePasswordVisibility('confirm_password', this)"
+                style="margin-top:115px; margin-right: 25px; font-size: 25px"></i>
+            </div>
+            <button type="submit" class="btn">Reset Password</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openForgotPasswordModal() {
+        document.getElementById('forgotPasswordModal').style.display = 'block';
+    }
+
+    function closeForgotPasswordModal() {
+        document.getElementById('forgotPasswordModal').style.display = 'none';
+    }
+
+    function togglePasswordVisibility(inputId, icon) {
+        var input = document.getElementById(inputId);
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.replace('bx-show-alt', 'bx-hide');
+        } else {
+            input.type = 'password';
+            icon.classList.replace('bx-hide', 'bx-show-alt');
+        }
+    }
+</script>
+
+</body>
+</html>
