@@ -239,12 +239,13 @@ $(document).ready(function() {
     }
 
     $('.btnIndivReceipt').on('click', function() {
-    let transactionId = $(this).closest('tr').data('transaction_id');
-    let filename = `TCFM_TransactionNo._${transactionId}`;
-    let receiptPath = `/website/receipts/${encodeURIComponent(filename)}`;
+        let transactionId = $(this).closest('tr').data('transaction_id');
+        let filename = `TCFM_TransactionNo._${transactionId}.pdf`;
+        let receiptPath = `/website/receipts/${encodeURIComponent(filename)}`;
 
     window.location.href = receiptPath;
     });
+
 
     function downloadReceipt(filename) {
         let receiptPath = `./website/receipts/${filename}`;
