@@ -180,22 +180,17 @@ function addProductToTransaction() {
         return;
     }
 
-    // Check if the product already exists in the transaction
     var existingItem = $('.usertable tbody').find('tr[data-product-id="' + productCode + '"]');
 
     if (existingItem.length > 0) {
-        // Update existing product quantity and subtotal
         var currentQuantity = parseInt(existingItem.find('.quantity').text());
         var newQuantity = currentQuantity + quantity;
         existingItem.find('.quantity').text(newQuantity);
         
-        // Update product in the backend
         updateProductInTransaction(productCode, newQuantity);
         
-        // Update total amount in the UI
         updateTotalAmount();
     } else {
-        // Add new product to the transaction
         $.ajax({
             type: 'POST',
             url: '/add-product-to-transaction',
@@ -241,10 +236,10 @@ function updateTotalAmount() {
     function updateTotalAmount() {
     var totalAmount = 0;
 
-    // Iterate through each row in the table
+
     $('.usertable tbody tr').each(function() {
-        var quantity = parseInt($(this).find('.quantity').text()); // Assuming you have a class 'quantity' for quantity display
-        var unitPrice = parseFloat($(this).find('.unit-price').text()); // Replace with actual class for unit price
+        var quantity = parseInt($(this).find('.quantity').text());
+        var unitPrice = parseFloat($(this).find('.unit-price').text());
 
         if (!isNaN(quantity) && !isNaN(unitPrice)) {
             var subtotal = quantity * unitPrice;
@@ -252,8 +247,7 @@ function updateTotalAmount() {
         }
     });
 
-    // Update the total amount display in your UI
-    $('#totalAmount').text('Total: P' + totalAmount.toFixed(2)); // Adjust based on your currency format
+    $('#totalAmount').text('Total: P' + totalAmount.toFixed(2)); 
 }
 }
 
@@ -267,7 +261,7 @@ function removeProductFromTransaction(productId) {
         type: 'DELETE',
         url: `/inventory/delete_product/${productId}`,
         success: function(response) {
-            updateTransactionDetails(); // Update UI after successful removal
+            updateTransactionDetails();
         },
         error: function(xhr, status, error) {
             alert('Error removing product: ' + error);
@@ -461,9 +455,6 @@ function completeTransaction() {
         contentType: 'application/json',
         success: function(response) {
             alert('Transaction completed successfully!');
-            // Optionally, update UI or reset transaction state
-            // Example: Reset transaction details or redirect to a new transaction page
-            // window.location.href = '/new_transaction';  // Redirect example
         },
         error: function(xhr, status, error) {
             var errorMessage = xhr.responseJSON ? xhr.responseJSON.error : 'Failed to complete transaction.';

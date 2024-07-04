@@ -15,11 +15,14 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 
     </head>
+    
 
     <body>
+
         <div id="flash-messages">
             {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
+            
                 <div class="row fixed-top" style="z-index: 1000;">
                 <div class="col-md-12">
                 {% for category, message in messages %}
@@ -35,13 +38,17 @@
             {% endif %}
             {% endwith %}
         </div>
-    <div class="container">
-        {% include 'base.html'%}
 
+    <div class="container">
         <form method="POST">
             <div class="wrapper">
                 <div class="container mb-4" style="border: 0cm;">
-                    <i class='bx bx-package'></i>
+                    <a href="{{ url_for('cashierops.user_cashier') }}">
+                        <i class='bx bx-arrow-back' style="font-size: 30px; color: #ff9c03"></i>
+                        <a href="{{ url_for('cashierops.user_cashier') }}" style="font: 50px; color: #ff9c03">
+                            BACK
+                        </a>
+                    </a>
                     <a class="a1 ml-2">INVENTORY</a>
                 </div>
                 <div></div>
@@ -84,7 +91,7 @@
                     <button type="btnAddStock" class="btn btn-block btnAddStock" onclick="AddorReduceStocks()">Add/Reduce Stocks</button>
                 </div>
                 <div>
-                    <button type="btnDelete" class="btn btn-block btnDelete" onclick="deleteProduct()">Delete</button>
+                    <button type="btnDelete" class="btn btn-block btnDelete" onclick="return deleteProduct()">Delete</button>
                 </div>
                 <div class="input-box">
                     <label>Price</label>
@@ -228,29 +235,33 @@ $(document).ready(function() {
 });
 
 // Function to delete a product
-function deleteProduct(prodCode) {
-    if (prodCode != '') {
-        $.ajax({
-            url: `/inventory/delete_product/${prodCode}`,
-            type: 'DELETE',
-            success: function(response) {
-                alert(response.message);
+function deleteProduct() {
+    var prodCode = $('#prodCode').val();
 
-                const tableRow = document.querySelector(`tr[data-pcode="${prodCode}"]`);
-                if (tableRow) {
-                    tableRow.remove();
-                    window.location.reload();
-                }
-
-                clearFields();
-            },
-            error: function(xhr, status, error) {
-                console.error('Error deleting product:', xhr.responseText);
-                alert('Error deleting product');
-            }
-        });
+    if (!prodCode) {
+        alert('Please enter a product code.');
+        return false; // Prevent form submission
     }
+
+    $.ajax({
+        url: '/delete_product',
+        method: 'POST',
+        data: { prodCode: prodCode },
+        success: function(response) {
+            if (response.success) {
+                location.reload(); // Reload the page to reflect changes
+            } else {
+                console.error('Error deleting product:', response.message);
+            }
+        },
+        error: function(error) {
+            console.error('Error deleting product:', error);
+        }
+    });
+
+    return false; // Prevent form submission
 }
+
 
 
 // Function to add or reduce stocks
@@ -526,33 +537,33 @@ function AddorReduceStocks() {
 }
 
 
-    function searchProducts() {
-        const prodType = document.getElementById('prodType').value.trim().toLowerCase();
-        const prodName = document.getElementById('prodName').value.trim().toLowerCase();
-        const prodCode = document.getElementById('prodCode').value.trim().toLowerCase();
-        const prodStock = document.getElementById('prodStock').value.trim().toLowerCase();
-        const prodPrice = document.getElementById('prodPrice').value.trim().toLowerCase();
+function searchProducts() {
+    const prodType = document.getElementById('prodType').value.trim().toLowerCase();
+    const prodName = document.getElementById('prodName').value.trim().toLowerCase();
+    const prodCode = document.getElementById('prodCode').value.trim().toLowerCase();
+    const prodStock = document.getElementById('prodStock').value.trim().toLowerCase();
+    const prodPrice = document.getElementById('prodPrice').value.trim().toLowerCase();
 
-        const tableRows = document.querySelectorAll('.prodtable tbody tr');
+    const tableRows = document.querySelectorAll('.prodtable tbody tr');
 
-        tableRows.forEach(row => {
-            const rowProdType = row.cells[0].textContent.trim().toLowerCase(); 
-            const rowProdCode = row.cells[1].textContent.trim().toLowerCase();
-            const rowProdName = row.cells[2].textContent.trim().toLowerCase(); 
-            const rowProdStock = row.cells[3].textContent.trim().toLowerCase(); 
-            const rowProdPrice = row.cells[4].textContent.trim().toLowerCase();
+    tableRows.forEach(row => {
+        const rowProdType = row.cells[0].textContent.trim().toLowerCase();
+        const rowProdCode = row.cells[1].textContent.trim().toLowerCase();
+        const rowProdName = row.cells[2].textContent.trim().toLowerCase();
+        const rowProdStock = row.cells[3].textContent.trim().toLowerCase();
+        const rowProdPrice = row.cells[4].textContent.trim().toLowerCase();
 
-            if ((prodType === '' || rowEid.includes(prodType)) &&
-                (prodName === '' || rowEmail.includes(prodName)) &&
-                (prodCode === '' || rowFirstName.includes(prodCode)) &&
-                (prodStock === '' || rowLastName.includes(prodStock)) &&
-                (prodPrice === '' || rowBday.includes(prodPrice))) {
-                row.style.display = ''; 
-            } else {
-                row.style.display = 'none'; 
-            }
-        });
-    }
+        if ((prodType === '' || rowProdType.includes(prodType)) &&
+            (prodName === '' || rowProdName.includes(prodName)) &&
+            (prodCode === '' || rowProdCode.includes(prodCode)) &&
+            (prodStock === '' || rowProdStock.includes(prodStock)) &&
+            (prodPrice === '' || rowProdPrice.includes(prodPrice))) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
 
     function generatePDF() {
         var prodType = $('#prodType').val();

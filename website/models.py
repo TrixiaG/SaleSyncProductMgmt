@@ -75,6 +75,7 @@ class IndivTransaction(db.Model):
     quantity = db.Column(db.Integer)
     unit_price = db.Column(db.Numeric(10, 2))
     total_price = db.Column(db.Numeric(10, 2))
+    is_void = db.Column(db.Boolean, default=False)  # New field for marking as VOID
 
     transaction = db.relationship('Transaction', back_populates='items')
     product = db.relationship('prodInventory')
@@ -85,6 +86,26 @@ class IndivTransaction(db.Model):
         self.quantity = quantity
         self.unit_price = unit_price
         self.total_price = quantity * unit_price
+        self.is_void = False  # Default to not voided
+
+    def mark_as_void(self):
+            self.is_void = True
+
+    def restore_from_void(self):
+        self.is_void = False
+
+    @property
+    def formatted_total_price(self):
+        if self.is_void:
+            return 0
+        else:
+            return self.total_price
+
+    def mark_as_void(self):
+        self.is_void = True
+
+    def restore_from_void(self):
+        self.is_void = False
 
 class TransactionReceipt(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

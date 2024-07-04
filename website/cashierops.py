@@ -10,6 +10,7 @@ from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 import os
 import io
+from flask import redirect, url_for
 
 cashierops = Blueprint('cashierops', __name__)
 
@@ -24,10 +25,13 @@ def user_cashier():
         flash('You are not authorized to view this page.', category='error')
         return render_template("restricted.html", boolean=True)
 
+    if current_user == 'Deactivated':
+        flash('You are not authorized to view this page.', category='error')
+        return render_template("restricted.html", boolean=True)
+
     else:
         return render_template("cashierops.html", boolean=True, user_logged=logged_in_user, date=current_date, current_user=current_user)
 
-# Route to get product details by product code
 @cashierops.route('/get-product-details/<productCode>', methods=['GET'])
 @login_required
 def get_product_details(productCode):
@@ -44,8 +48,20 @@ def get_product_details(productCode):
         }), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-    
-# Route to get distinct product types
+
+@cashierops.route('/void_transaction/<int:transaction_id>', methods=['POST'])
+def void_transaction(transaction_id):
+    indiv_transaction = IndivTransaction.query.filter_by(transaction_id=transaction_id).first()
+    if indiv_transaction:
+        indiv_transaction.mark_as_void()
+        # Add logic to update stock if necessary
+        # Example: indiv_transaction.product.update_stock(indiv_transaction.quantity)
+        db.session.commit()
+        flash('Transaction voided successfully.', 'success')
+    else:
+        flash('Transaction not found.', 'error')
+    return redirect(url_for('view_transactions'))  # Redirect to your transactions view
+
 @cashierops.route('/get-product-types', methods=['GET'])
 @login_required
 def get_product_types():

@@ -11,7 +11,6 @@ from io import BytesIO
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 
-
 inventory = Blueprint('inventory', __name__)
 
 @inventory.route('/inventory', methods=['GET', 'POST'])
@@ -23,6 +22,11 @@ def prodInventoryView():
         flash('You are not authorized to view this page.', category='error')
         return render_template("restricted.html", boolean=True)
     
+    if current_user == 'Deactivated':
+        flash('You are not authorized to view this page.', category='error')
+        return render_template("restricted.html", boolean=True)
+
+
     else:
         return render_template("inventory.html",products=products, current_user=current_user)
     
@@ -31,26 +35,31 @@ def prodInventoryView():
 @inventory.route('/inventory/add_product', methods=['POST'])
 @login_required
 def addprod():
-    if request.method == 'POST':
+    try:
         data = request.get_json()
+
         ptype = data.get('prodType', '').strip()
         pcode = data.get('prodCode', '').strip()
         pname = data.get('prodName', '').strip()
         pstock = data.get('prodStock', '').strip()
         pprice = data.get('prodPrice', '').strip()
 
+        # Convert pstock to int and pprice to float
         try:
             pstock = int(pstock)
         except ValueError:
             pstock = 0
+
         try:
             pprice = float(pprice)
         except ValueError:
             pprice = 0.0
 
+        # Get current time and user ID
         ptimelog = datetime.utcnow()
         puserlog = current_user.eid
 
+        # Check if product with pname already exists
         existing_product = prodInventory.query.filter_by(pname=pname).first()
 
         if existing_product:
@@ -63,15 +72,26 @@ def addprod():
             existing_product.pprice = pprice
         else:
             # Create new product
-            new_product = prodInventory(ptype=ptype, pcode=pcode, pname=pname, pstock=pstock, ptimelog=ptimelog, puserlog=puserlog, pprice=pprice)
+            new_product = prodInventory(
+                ptype=ptype,
+                pcode=pcode,
+                pname=pname,
+                pstock=pstock,
+                ptimelog=ptimelog,
+                puserlog=puserlog,
+                pprice=pprice
+            )
             db.session.add(new_product)
 
+        # Commit changes to the database
         db.session.commit()
 
-        return jsonify({'status': 'success'})
-    else:
-        return jsonify({'status': 'error', 'message': 'Method not allowed'}), 405
+        return jsonify({'status': 'success'}), 200
 
+    except Exception as e:
+        # Rollback transaction on error
+        db.session.rollback()
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 # ...
 
 @inventory.route('/inventory/search', methods=['POST'])
@@ -126,6 +146,7 @@ def delete_product(prodCode):
     except Exception as e:
         db.session.rollback()  # Rollback the transaction on error
         return jsonify({'status': 'error', 'message': f"Error deleting product: {str(e)}"}), 500
+    
 #update product
 @inventory.route('/inventory/update_product', methods=['POST'])
 @login_required
@@ -153,7 +174,8 @@ def update_product():
             return jsonify({'status': 'error', 'message': 'Product not found.'}), 404
 
     except Exception as e:
-        return None
+        db.session.rollback()  # Rollback the transaction on error
+        return jsonify({'status': 'error', 'message': f"Error updating product: {str(e)}"}), 500
     
 # Route to search product by code
 @inventory.route('/inventory/search_by_code', methods=['POST'])

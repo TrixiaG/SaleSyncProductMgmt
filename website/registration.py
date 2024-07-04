@@ -4,6 +4,8 @@ from . import db
 from werkzeug.security import generate_password_hash, check_password_hash
 import re
 from datetime import datetime
+import random
+import string
 
 
 registration = Blueprint('registration', __name__)
@@ -32,8 +34,15 @@ def validate2PW(pw1, pw2):
 
 @registration.route('/sign-up', methods=['GET', 'POST'])
 def userRegistration():
+
+    def generate_eid():
+        first_letter = random.choice(string.ascii_lowercase)
+        random_digits = ''.join(random.choices(string.digits, k=7))
+        return f"{first_letter}{random_digits}"
+
+    generated_eid = generate_eid()
+
     if request.method == 'POST':
-        eid = request.form.get('eID')
         email = request.form.get('emailAddress')
         first_name = request.form.get('firstName')
         last_name = request.form.get('lastName')
@@ -48,7 +57,7 @@ def userRegistration():
             return render_template("signup.html")
         
         #Check for Duplicate EID
-        existing_userEID = User.query.filter_by(eid=eid).first()
+        existing_userEID = User.query.filter_by(eid=generated_eid).first()
         if existing_userEID:
             flash('EID is already is already in use.', category='error')
             return render_template("signup.html")
@@ -60,11 +69,7 @@ def userRegistration():
             return render_template("signup.html")
         
 
-        if not eid:
-            flash('Employee ID (EID) Number is required.', category='error')
-        elif not validateEID(eid):
-            flash('EID must start with a letter and be followed by 7 digits.', category='error')
-        elif not validateEmail(email):
+        if not validateEmail(email):
             flash('Email address is not valid.', category='error')
         elif not first_name:
             flash('First Name is required.', category='error')
@@ -91,11 +96,11 @@ def userRegistration():
         elif not bdaystr:
             flash('Please select birthday.', category='error')
         else:
-            new_user = User(eid=eid, email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(pw1, method='pbkdf2:sha256'), bday=bday, access='Pending')
+            new_user = User(eid=generated_eid, email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(pw1, method='pbkdf2:sha256'), bday=bday, access='Pending')
             db.session.add(new_user)
             db.session.commit()        
             
             flash('Account creation request has been submitted. Please wait for admin&apos;s approval.', category='success')
             return render_template("login.html")
 
-    return render_template("signup.html")
+    return render_template('signup.html', generated_eid=generate_eid())

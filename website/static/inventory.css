@@ -29,6 +29,10 @@ i.bx-package {
     color: #ff9c03;
 }
 
+.voided-transaction {
+    color: #721c24; 
+}
+
 * {
     margin: 0;
     padding: 0;

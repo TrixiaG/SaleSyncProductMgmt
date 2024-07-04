@@ -16,7 +16,7 @@ def UserPage():
     if current_user.access == 'Admin':
         return render_template("usermanagement.html", users=users)
 
-    else:
+    else: 
        return render_template("restricted.html", boolean=True)
    
 
@@ -86,21 +86,17 @@ def get_user_details():
         print(f"Error fetching user details: {str(e)}")
         return jsonify({'message': 'Error fetching user details'}), 500
 
-@usermanagement.route('/usermgmt/delete/<eid>', methods=['DELETE'])
-@login_required
-def delete_user(eid):
-    try:
-        user = User.query.filter_by(eid=eid).first()
+@usermanagement.route('/usermgmt/deactivate/<eid>', methods=['POST'])
+def deactivate_user(eid):
+    user = User.query.filter_by(eid=eid).first()
 
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            return jsonify({'message': 'User deleted successfully'}), 200
-        else:
-            return jsonify({'message': 'User not found'}), 404
-    except Exception as e:
-        print(f"Error deleting user: {str(e)}")
-        return jsonify({'message': 'Error deleting user'}), 500
+    if not user:
+        return jsonify({'message': 'User not found'}), 404
+
+    user.access = 'Deactivated'
+    db.session.commit()
+
+    return jsonify({'message': 'User deactivated successfully'})
 
     
 @usermanagement.route('/usermgmt/approve', methods=['POST'])

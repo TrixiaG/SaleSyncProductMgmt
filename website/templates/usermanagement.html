@@ -86,7 +86,7 @@
                 <button type="btnAprv" class="btn btn-block btnAprv" onclick="approveUser(); return false;">Approve Registration</button>
             </div>
             <div>
-                <button type="btnDelete" class="btn btn-block btnDelete" onclick="deleteUser(); return false;">Delete</button>
+                <button type="btnDelete" class="btn btn-block btnDelete" onclick="deactivateUser(); return false;">Deactivate User</button>
             </div>
             <div class="input-box">
                 <label>BIRTH DATE</label>
@@ -199,28 +199,29 @@
     });
     }
 
-    function deleteUser(eid) {
-        var eid = $('#eid').val();
+    function deactivateUser() {
+    const eid = document.getElementById('eid').value;
 
-
-    if (confirm('Are you sure you want to delete this user?')) {
+    if (confirm('Are you sure you want to deactivate this user?')) {
         $.ajax({
-            url: `/usermgmt/delete/${eid}`,
-            type: 'DELETE',
+            url: `/usermgmt/deactivate/${eid}`,
+            type: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify({
+                eid: eid
+            }),
             success: function(response) {
                 alert(response.message);
-                if (tableRow) {
-                    tableRow.remove();
-                    window.location.reload();
-                }
-                clearFields();
+                document.getElementById('access').value = 'Deactivated';
+                window.location.reload();
             },
             error: function(error) {
-                alert('Error deleting user');
+                alert('Error deactivating user');
             }
         });
     }
 }
+
 
     function clearFields() {
         document.getElementById('eid').value = '';
@@ -230,6 +231,8 @@
         document.getElementById('bday').value = '';
         document.getElementById('access').value = '';
     }
+
+    
     function approveUser() {
         const eid = document.getElementById('eid').value;
 

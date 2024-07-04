@@ -9,7 +9,6 @@
             crossorigin="anonymous"/>
       <link rel="stylesheet" href="../static/stylesignup.css">
       <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-      <!-- Include jQuery and jQuery UI CSS for DatePicker -->
       <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
   </head> 
   <body>
@@ -36,9 +35,10 @@
         <form method="POST">
           <div class="wrapper">
             <h1>Create an Account</h1>  
+
             <div class="input-box">
               <label>EMPLOYEE ID NUMBER</label>
-              <input type="text" required id="eID" name="eID">
+              <input type="text" placeholder="EID" value="{{ generated_eid }}" readonly>
             </div>
             <div class="input-box">
               <label>EMAIL ADDRESS</label>
