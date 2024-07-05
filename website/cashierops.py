@@ -222,7 +222,7 @@ def delete_product(prodCode):
                 if product_inventory:
                     current_app.logger.debug(f"Product Inventory before update: {product_inventory.pcode}, Stock: {product_inventory.pstock}")
 
-                    product_inventory.pstock += (item_to_delete.quantity)/2
+                    product_inventory.pstock += (item_to_delete.quantity)
 
                     current_app.logger.debug(f"Product Inventory after update: {product_inventory.pcode}, Updated Stock: {product_inventory.pstock}")
                 else:
