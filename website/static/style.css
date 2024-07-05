@@ -165,7 +165,19 @@ body {
     width: 100%;
 }
 
-
+.btnStatus {
+    width: 20px;
+    height: 20px;
+    background: #ff9c03;
+    border: none;
+    outline: none;
+    border-radius: 40px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+    font-weight: 600;
+}
 .wrapper .btn {
     margin-top: 10px;
     width: 100%;

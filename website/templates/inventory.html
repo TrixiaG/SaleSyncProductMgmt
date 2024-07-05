@@ -70,7 +70,7 @@
                     <button type="btnSearch" class="btn btn-block btnSearch" onclick="searchProducts()">Search</button>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-block btnPrint" onclick="generatePDF()">Print</button>
+                    <button type="button" class="btn btn-block btnPrint" onclick="openPrintModal()">Print</button>
                 </div>
                 <div>
                     <button type="btnUpdate" class="btn btn-block btnUpdate" onclick="updateProduct()" oninput="fetchProductDetailsByCode()">Update</button>
@@ -90,9 +90,23 @@
                 <div>
                     <button type="btnAddStock" class="btn btn-block btnAddStock" onclick="AddorReduceStocks()">Add/Reduce Stocks</button>
                 </div>
-                <div>
-                    <button type="btnDelete" class="btn btn-block btnDelete" onclick="return deleteProduct()">Delete</button>
-                </div>
+                <div id="printModal" style="display:none;">
+                    <h2>Generate Inventory Report</h2>
+                    <label>
+                      <input type="radio" name="printOption" value="all" checked> All Products
+                    </label>
+                    <label>
+                      <input type="radio" name="printOption" value="available"> Available Products
+                    </label>
+                    <label>
+                      <input type="radio" name="printOption" value="unavailable"> Unavailable Products
+                    </label>
+                    <button type="button" class="btn btn-block" style="margin: 0px; margin-left: 150px;" onclick="generatePDF()">Print</button>
+                    <button type="button" class="btn btn-block" style="margin-left: 150px; margin-top: 20px;" onclick="closePrintModal()">Cancel</button>
+                  </div>
+                  <div>
+
+                  </div>
                 <div class="input-box">
                     <label>Price</label>
                     <input type="number" id="prodPrice" name="prodPrice">
@@ -135,6 +149,15 @@
                                         Price
                                     </button>
                                 </th>
+                                <th scope="col">
+                                    <button class="btn btn-link sort-btn" data-column="pprice">
+                                        <i class='bx bx-sort' data-column="pprice"></i>
+                                        Status
+                                    </button>
+                                </th>
+                                <th scope="col">
+                                    Actions
+                                </th>
 
                             </tr>
                         </thead>
@@ -146,6 +169,12 @@
                                 <td>{{ product.pname }}</td>
                                 <td>{{ product.pstock }}</td>
                                 <td>{{ product.pprice }}</td>
+                                <td>{{ product.status }}</td>
+                                <td>
+                                    <button class="btn" style="font-weight: 600; background-color: #ff9c03; color: white;" onclick="toggleStatus('{{ product.pcode }}')">
+                                      {{ 'Set Unavailable' if product.status == 'Available' else 'Set Available' }}
+                                    </button>
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -231,6 +260,67 @@ $(document).ready(function() {
         event.preventDefault();
         searchProducts();
     });
+
+    $.ajax({
+        type: 'GET',
+        url: '/get-product-types',
+        success: function(response) {
+            var types = response.product_types;
+            var options = '';
+            types.forEach(function(type) {
+                options += '<option value="' + type + '">' + type + '</option>';
+            });
+            $('#prodTypeDropdown').append(options);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching product types:', error);
+        }
+    });
+
+    // Handle input event for product type input to populate product names
+    $('#prodType').on('input', function() {
+        var selectedType = $(this).val();
+        $('#prodNameDropdown').empty(); // Clear previous options
+
+        // Fetch product names based on selected type and availability
+        $.ajax({
+            type: 'GET',
+            url: '/get-product-names/' + selectedType,
+            success: function(response) {
+                var names = response.product_names;
+                var options = '';
+                names.forEach(function(product) {
+                    options += '<option value="' + product.name + '" data-code="' + product.code + '">';
+                });
+                $('#prodNameDropdown').append(options);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error fetching product names:', error);
+            }
+        });
+    });
+
+    $('#prodType').on('input', function() {
+    var selectedType = $(this).val();
+    $('#prodNameDropdown').empty(); // Clear previous options
+
+    // Fetch product names based on selected type and availability
+    $.ajax({
+        type: 'GET',
+        url: '/get-product-names/' + selectedType + '/available', // Adjust endpoint to include availability filter
+        success: function(response) {
+            var names = response.product_names;
+            var options = '';
+            names.forEach(function(product) {
+                options += '<option value="' + product.name + '" data-code="' + product.code + '">';
+            });
+            $('#prodNameDropdown').append(options);
+        },
+        error: function(xhr, status, error) {
+            console.error('Error fetching product names:', error);
+        }
+    });
+});
 
 });
 
@@ -432,29 +522,6 @@ function AddorReduceStocks() {
         return -1;
     }
 
-
-    function fetchProductTypes() {
-        $.ajax({
-            url: '/inventory/get_product_types',
-            type: 'GET',
-            success: function(response) {
-                if (response.status === 'success') {
-                    var productTypes = response.productTypes;
-                    var productTypeList = $('#productTypeList');
-                    productTypeList.empty();
-                    productTypes.forEach(function(ptype) {
-                        productTypeList.append('<option value="' + ptype + '"></option>');
-                    });
-                } else {
-                    console.error('Error fetching product types:', response.message);
-                }
-            },
-            error: function(error) {
-                console.error('Error fetching product types:', error);
-            }
-        });
-    }
-
     function fetchProductNames() {
         var prodType = $('#prodType').val();  // Fetch the product type from input
 
@@ -565,36 +632,74 @@ function searchProducts() {
     });
 }
 
-    function generatePDF() {
-        var prodType = $('#prodType').val();
-        var prodCode = $('#prodCode').val();
-        var prodName = $('#prodName').val();
+function openPrintModal() {
+    document.getElementById('printModal').style.display = 'block';
+  }
+
+  function closePrintModal() {
+    document.getElementById('printModal').style.display = 'none';
+  }
+
+  function generatePDF() {
+    var printOption = document.querySelector('input[name="printOption"]:checked');
+
+    if (printOption) {
+        var selectedValue = printOption.value;
 
         $.ajax({
             url: '/inventory/pdf',
             type: 'POST',
             contentType: 'application/json',
-            data: JSON.stringify({
-                'prodType': prodType,
-                'prodCode': prodCode,
-                'prodName': prodName
-            }),
-            success: function(response) {
-                var downloadLink = document.createElement('a');
-                downloadLink.href = URL.createObjectURL(new Blob([response], {type: 'application/pdf'}));
-                downloadLink.download = response.filename;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
+            data: JSON.stringify({ printOption: selectedValue }),
+            responseType: 'blob', // Ensure responseType is set to 'blob' for binary data
+            success: function(response, status, xhr) {
+                // Check content type
+                var contentType = xhr.getResponseHeader('content-type');
+                if (contentType.indexOf('application/pdf') !== -1) {
+                    // Create blob object from response
+                    var blob = new Blob([response], { type: 'application/pdf' });
+
+                    // Create URL for the blob
+                    var blobURL = URL.createObjectURL(blob);
+
+                    // Initiate download
+                    var downloadLink = document.createElement('a');
+                    downloadLink.href = blobURL;
+                    downloadLink.download = 'InventoryReport.pdf';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                } else {
+                    console.error('Error: Not a valid PDF file');
+                }
             },
-            error: function(error) {
+            error: function(xhr, status, error) {
                 console.error('Error generating PDF:', error);
-                alert('An error occurred while generating the PDF.');
             }
         });
+    } else {
+        console.error('No print option selected.');
     }
+}
 
 
+    function toggleStatus(pcode) {
+        fetch('/inventory/toggle_status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pcode: pcode })
+        })
+        .then(response => response.json())
+        .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+        });
+    }
     </script>
 
     </body>

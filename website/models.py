@@ -40,8 +40,9 @@ class prodInventory(db.Model):
     ptimelog = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     puserlog = db.Column(db.String(50), nullable=False)
     pprice = db.Column(db.Numeric(10, 2), default=0)
+    status = db.Column(db.String(50), default='Available')
 
-    def __init__(self, ptype, pcode, pname, pstock, ptimelog, puserlog, pprice):
+    def __init__(self, ptype, pcode, pname, pstock, ptimelog, puserlog, pprice, status='Available'):
         self.ptype = ptype
         self.pcode = pcode
         self.pname = pname
@@ -49,6 +50,8 @@ class prodInventory(db.Model):
         self.ptimelog = ptimelog
         self.puserlog = puserlog
         self.pprice = pprice
+        self.status = status
+
 
     def update_stock(self, quantity):
         if self.pstock >= quantity:

@@ -94,8 +94,21 @@
                 <div>
                     <button type="button" id="btnAddProd" class="btn btn-block btnAddProd" style="float: right;" onclick="addProductToTransaction()">Add Product</button>
                 </div>
-                <div>
-                </div>  
+                <div></div>
+                <div></div>
+
+                <div></div>
+                <div></div>
+
+                <div class="input-box">
+                    <label for="clientName">Client Name</label>
+                    <input type="text" id="clientName" name="clientName">
+                </div>
+                
+                <div class="input-box">
+                    <label for="cashTendered">Cash Tendered</label>
+                    <input type="number" id="cashTendered" name="cashTendered" step="0.01">
+                </div>
             </form>
                 <div class="merge-rows">
                 <form method="GET">
@@ -309,6 +322,8 @@ function updateTransactionDetails() {
         success: function(response) {
             $('#transactionNumber').text('Transaction No. ' + response.transaction_id);
             $('#totalAmount').text('Total: P'+ response.total_amount);
+
+            
             var itemsHtml = '';
             response.items.forEach(function(item) {
                 itemsHtml += `
@@ -319,7 +334,7 @@ function updateTransactionDetails() {
                         <td style="font-size: 10px; text-align: center; vertical-align: middle;" >${item.total_price}</td>
                         <td style="font-size: 10px; text-align: center; vertical-align: middle;">
                             <button type="button" class="btnRemove remove-product-btn" data-product-id="${item.product_id}">
-                                <i class="bx bxs-trash"></i>
+                                <a>VOID</a>
                             </button>
                         </td>
                     </tr>
@@ -364,6 +379,13 @@ $(document).ready(function() {
 });
 //RECEIPT GENERATE
 function generatePDF() {
+        var clientName = $('#clientName').val();
+        var cashTendered = parseFloat($('#cashTendered').val());
+
+        if (!clientName || isNaN(cashTendered)) {
+        alert('Please enter both client name and a valid cash tendered amount.');
+        return;
+    }
         $.ajax({
             url: '/cashierops/pdf',
             type: 'POST',
@@ -372,7 +394,9 @@ function generatePDF() {
                 'prodType': prodType,
                 'prodCode': prodCode,
                 'prodName': prodName,
-                'transaction_id': currentTransactionId 
+                'transaction_id': currentTransactionId, 
+                clientName: clientName,
+                cashTendered: cashTendered   
 }),
             success: function(response) {
                 var downloadLink = document.createElement('a');
@@ -444,6 +468,15 @@ $('.remove-product-btn').click(function(event) {
 
 
 function completeTransaction() {
+
+    var clientName = $('#clientName').val();
+    var cashTendered = parseFloat($('#cashTendered').val());
+
+    if (!clientName || isNaN(cashTendered)) {
+        alert('Please enter both client name and a valid cash tendered amount.');
+        return;
+    }
+
     if (!currentTransactionId) {
         alert('No current transaction to complete.');
         return;
@@ -453,6 +486,10 @@ function completeTransaction() {
         type: 'POST',
         url: `/complete_transaction/${currentTransactionId}`,
         contentType: 'application/json',
+        data: JSON.stringify({
+            clientName: clientName,
+            cashTendered: cashTendered
+        }),
         success: function(response) {
             alert('Transaction completed successfully!');
         },
