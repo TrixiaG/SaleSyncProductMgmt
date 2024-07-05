@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, send_file, current_app, send_from_directory
 from .models import User, Transaction, TransactionReceipt, IndivTransaction
 from . import db
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from flask_login import login_required, current_user
 
 from reportlab.pdfgen import canvas
@@ -10,6 +10,7 @@ from io import BytesIO
 from reportlab.lib import colors
 from reportlab.platypus import Table, TableStyle
 import os
+from sqlalchemy import func
 
 transactions = Blueprint('transactions', __name__)
 
@@ -37,12 +38,27 @@ def generate_report():
         endDate = request.form.get('endDate')
 
         try:
-            # Fetch all transaction receipts within the date range        # Fetch all transaction receipts within the date range
-            transaction_receipts = TransactionReceipt.query.filter(
+            # Add a day to the end date to include transactions up to and including the end date
+            end_date = datetime.strptime(endDate, '%Y-%m-%d') + timedelta(days=1)
+            endDate = end_date.strftime('%Y-%m-%d')
+
+            # Fetch distinct latest transaction receipts within the date range
+            subquery = db.session.query(
+                func.max(TransactionReceipt.created_at).label('max_created_at'),
+                TransactionReceipt.transaction_id
+            ).filter(
                 TransactionReceipt.created_at.between(startDate, endDate)
+            ).group_by(TransactionReceipt.transaction_id).subquery()
+
+            transaction_receipts = db.session.query(TransactionReceipt).join(
+                subquery, 
+                db.and_(
+                    TransactionReceipt.transaction_id == subquery.c.transaction_id,
+                    TransactionReceipt.created_at == subquery.c.max_created_at
+                )
             ).all()
 
-            # Extract transaction IDs from receipts
+            # Extract transaction IDs from filtered receipts
             transaction_ids = [receipt.transaction_id for receipt in transaction_receipts]
 
             # Fetch all transactions corresponding to the retrieved IDs
@@ -50,11 +66,6 @@ def generate_report():
                 Transaction.transaction_id.in_(transaction_ids)
             ).all()
 
-            # Debug print statements to check results
-            #print(f"Start Date: {startDate}, End Date: {endDate}")
-            #print(f"Transactions Query: {transactions_query}")
-
-            # Prepare the PDF report
             buffer = BytesIO()
             report = canvas.Canvas(buffer, pagesize=letter)
             pagewidth = report._pagesize[0]
