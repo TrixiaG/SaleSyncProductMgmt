@@ -497,6 +497,9 @@ function AddorReduceStocks() {
             case 4: // Sort by Price
                 sortFunction = (a, b) => parseFloat(a.cells[4].textContent) - parseFloat(b.cells[4].textContent);
                 break;
+            case 4: // Sort by Status
+                sortFunction = (a, b) => parseFloat(a.cells[5].textContent) - parseFloat(b.cells[5].textContent);
+                break;
             default:
                 return;
         }
